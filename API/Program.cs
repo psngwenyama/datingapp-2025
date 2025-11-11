@@ -31,6 +31,8 @@ builder.Services.AddCors();
 // This service will be used to generate JWT tokens for user authentication
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+
 // ------------------------------------------------------------
 // Configure JWT Authentication
 // ------------------------------------------------------------
@@ -75,6 +77,20 @@ app.UseAuthorization();
 
 // Map controllers to handle incoming API requests (routes defined in controllers)
 app.MapControllers();
+
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
+try
+{
+    var context = services.GetRequiredService<AppDbContext>();
+    await context.Database.MigrateAsync();
+    await Seed.SeedUsers(context);
+}
+catch (Exception ex)
+{
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occured during migration");
+}
 
 // Run the application
 app.Run();
