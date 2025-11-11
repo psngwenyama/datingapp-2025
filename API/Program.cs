@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using API.Data;
 using API.Interfaces;
+using API.Middleware;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -60,6 +61,7 @@ var app = builder.Build();
 // ------------------------------------------------------------
 
 // Allow cross-origin requests from Angular dev server (localhost:4200)
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(x => x
     .AllowAnyHeader()   // Allow any HTTP header (e.g., Authorization, Content-Type)
     .AllowAnyMethod()   // Allow any HTTP method (GET, POST, PUT, DELETE, etc.)
